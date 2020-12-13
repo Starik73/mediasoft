@@ -1,61 +1,65 @@
-import React from "react";
-import { Container, Row, Col, Button, Card } from "react-bootstrap";
-import ThemeContext from "../../utils/ThemeContext";
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteProductAction, increaseItemsCountAction, decreaseItemsCountAction } from '../../redux/cart-reducer';
+import { unsetActiveButtonAction } from '../../redux/content-reducer';
+import { NavLink } from 'react-router-dom';
+import { itemsInCartPriceSelector, itemsCountSelector } from '../../selectors/cart-selectors';
+import { Container, Table, Button } from 'react-bootstrap';
 
 const Cart = () => {
-
-  const { theme, toggleTheme } = React.useContext(ThemeContext)
+  const dispatch = useDispatch()
+  const itemsInCart = useSelector(state => state.cart.itemsInCart)
+  const itemsInCartPrice = useSelector(itemsInCartPriceSelector)
+  const itemsInCartCount = useSelector(itemsCountSelector)
+  const deleteProduct = (id, count) => {
+    if (count === 1) {
+      dispatch(unsetActiveButtonAction(id))
+      dispatch(deleteProductAction(id))
+    } else {
+      debugger
+      dispatch(decreaseItemsCountAction(id))
+    }
+  }
+  const increaseItemsCount = (id) => dispatch(increaseItemsCountAction(id))
+  let number = 0
 
   return (
     <Container>
-    <h2>Корзина</h2>  
-    <Row className={theme === "light" ? "bg-ligth" : "bg-dark"}>
-    <Col>
-        <Card className={theme === "light" ? "bg-ligth" : "bg-dark"} style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="https://picsum.photos/200/100" />
-            <Card.Body>
-                <Card.Title>Product Title</Card.Title>
-                <Card.Text className={theme === "light" ? "bg-ligth" : "bg-dark"}>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
-            </Card.Text>
-                <Button variant="primary">Go somewhere</Button>
-                <span className="p-2">$100</span>
-            </Card.Body>
-        </Card>
-    </Col>
-    <Col>
-        <Card className={theme === "light" ? "bg-ligth" : "bg-dark"} style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="https://picsum.photos/201/100" />
-            <Card.Body>
-                <Card.Title>Product Title</Card.Title>
-                <Card.Text className={theme === "light" ? "bg-ligth" : "bg-dark"}>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
-            </Card.Text>
-                <Button variant="primary">Go somewhere</Button>
-                <span className="p-2">$150</span>
-            </Card.Body>
-        </Card>
-    </Col>
-    <Col>
-        <Card className={theme === "light" ? "bg-ligth" : "bg-dark"} style={{ width: '18rem' }}>
-            <Card.Img variant="top" src="https://picsum.photos/202/100" />
-            <Card.Body>
-                <Card.Title>Product Title</Card.Title>
-                <Card.Text className={theme === "light" ? "bg-ligth" : "bg-dark"}>
-                    Some quick example text to build on the card title and make up the bulk of
-                    the card's content.
-            </Card.Text>
-                <Button variant="primary">Go somewhere</Button>
-                <span className="p-2">$100</span>
-            </Card.Body>
-        </Card>
-    </Col>
-</Row>
-</Container>
-  );
-
-};
+      <div className='cart'>
+        {itemsInCart == 0
+          ? <h2 className='p-2'>Товары еще не выбраны - <NavLink exact to='/'><Button>добавить</Button></NavLink> </h2>
+          : <> <Table className='cartContainer'>
+            <thead>
+              <tr>
+                <th />
+                <th>Наименование</th>
+                <th>Артикул</th>
+                <th>Стоимость</th>
+                <th />
+                <th>Количество</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {itemsInCart.map(i =>
+                <tr key={i.id}>
+                  <td>{++number}</td>
+                  <td>{i.name}</td>
+                  <td>{i.article}</td>
+                  <td>{i.price} ₽</td>
+                  <td><button onClick={() => deleteProduct(i.id, i.count)}>-</button></td><td>{i.count}</td><td><button onClick={() => increaseItemsCount(i.id)}>+</button></td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+            <div className='orderBox'>
+              <h3>Товаров в корзине: <strong>{itemsInCartCount}</strong></h3>
+              <h3>Общая стоимость: <strong>{itemsInCartPrice}</strong></h3>
+            </div>
+          </>}
+      </div>
+    </Container>
+  )
+}
 
 export default Cart;

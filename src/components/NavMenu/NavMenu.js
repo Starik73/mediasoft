@@ -1,9 +1,14 @@
 import React from "react";
-import { Container, Navbar, Nav } from "react-bootstrap";
+import { Container, Navbar, Button } from "react-bootstrap";
 import Clock from '../Clock';
 import { NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { itemsCountSelector } from '../../selectors/cart-selectors';
+import ThemeContext from '../../utils/ThemeContext';
 
 const NavMenu = () => {
+  const itemsCount = useSelector(itemsCountSelector);
+  const { theme, toggleTheme } = React.useContext(ThemeContext);
 
   return (
 
@@ -15,16 +20,15 @@ const NavMenu = () => {
         </Navbar.Brand>
         </NavLink>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            <NavLink to='/secondpage'>
-              <Nav.Link href="#secondpage">Second Page</Nav.Link>
-            </NavLink>
-            <NavLink to='/cart'>
-              <Nav.Link href="#cart">Cart</Nav.Link>
-            </NavLink>
-          </Nav>
-        </Navbar.Collapse>
+        <Button
+          variant={theme === "light" ? "primary" : "warning"}
+          onClick={toggleTheme} className="m-2"
+        >Тема</Button>
+        <Navbar.Brand>
+          <NavLink to='/cart'>
+            <span>Товаров в корзине: </span>{itemsCount}
+          </NavLink>
+        </Navbar.Brand>
         <Navbar.Brand>
           <Clock />
         </Navbar.Brand>
